@@ -10,36 +10,34 @@ class admin{
   }
   //=============================================================
   public function motor($id_kendaraan,$nama_kendaraan,$merk,$jenis_kendaraan,$plat_nomor,$harga){
-    $sql =mysqli_query($this->conn, "INSERT INTO data_kendaraan(id_kendaraan,nama_kendaraan,merk,jenis_kendaraan,plat_nomor,harga)
-            VALUES ('$id_kendaraan','$nama_kendaraan','$merk','$jenis_kendaraan','$plat_nomor','$harga')") ;
+    $sql =mysqli_query($this->conn, "INSERT INTO data_kendaraan(id_kendaraan,nama_kendaraan,merk,jenis_kendaraan,plat_nomor,harga, status)
+            VALUES ('$id_kendaraan','$nama_kendaraan','$merk','$jenis_kendaraan','$plat_nomor','$harga', 1)") ;
     if ($sql) {
       ?>
       <script>
           alert("Tambah data berhasil");
-          location("kendaraan_motor.php");
+          location="index.php?page=kendaraan";
       </script>
       <?php
     }else {
       echo mysqli_error($this->conn);
     }
   }
-
   //================================================================
   public function mobil($id_kendaraan,$nama_kendaraan,$merk,$jenis_kendaraan,$plat_nomor,$harga){
-    $sql =mysqli_query($this->conn, "INSERT INTO data_kendaraan(id_kendaraan,nama_kendaraan,merk,jenis_kendaraan,plat_nomor,harga)
-            VALUES ('$id_kendaraan','$nama_kendaraan','$merk','$jenis_kendaraan','$plat_nomor','$harga')") ;
+    $sql =mysqli_query($this->conn, "INSERT INTO data_kendaraan(id_kendaraan,nama_kendaraan,merk,jenis_kendaraan,plat_nomor,harga, status)
+            VALUES ('$id_kendaraan','$nama_kendaraan','$merk','$jenis_kendaraan','$plat_nomor','$harga', 1)") ;
     if ($sql) {
       ?>
       <script>
           alert("Tambah data berhasil");
-          location("kendaraan_mobil.php");
+          location="index.php?page=kendaraan";
       </script>
       <?php
     }else {
       echo mysqli_error($this->conn);
     }
   }
-
   public function get_idMotor() {
     $db=mysqli_query($this->conn, "SELECT MAX(id_kendaraan) as maxId FROM data_kendaraan WHERE id_kendaraan LIKE 'MTR%'");
     $Arr=$db->fetch_assoc();
@@ -50,7 +48,6 @@ class admin{
     $newID = $Char . sprintf("%03s", $noUrut);
     return $newID;
   }
-
   public function get_idMobil() {
     $db=mysqli_query($this->conn, "SELECT MAX(id_kendaraan) as maxId FROM data_kendaraan WHERE id_kendaraan LIKE 'MBL%'");
     $Arr=$db->fetch_assoc();
@@ -66,22 +63,18 @@ class admin{
     $sql = mysqli_query($this->conn,"SELECT * FROM vpeminjaman WHERE lunas = 0");
     return $sql;
   }
-
   public function dashboard_kendaraan(){
     $sql = mysqli_query($this->conn, "SELECT * FROM data_kendaraan");
     return $sql;
   }
-
   public function dashboard_motor(){
     $sql = mysqli_query($this->conn, "SELECT * FROM data_kendaraan WHERE id_kendaraan LIKE 'MTR%'");
     return $sql;
   }
-
   public function dashboard_mobil(){
     $sql = mysqli_query($this->conn, "SELECT * FROM data_kendaraan WHERE id_kendaraan LIKE 'MBL%'");
     return $sql;
   }
-
   public function dashboard_history(){
     $sql = mysqli_query($this->conn,"SELECT * FROM vpeminjaman WHERE lunas = 1");
     return $sql;
@@ -91,7 +84,6 @@ class admin{
     $sql = mysqli_query($this->conn,"SELECT * FROM data_kendaraan WHERE id_kendaraan = '$id_kendaraan'");
     return $sql;
   }
-
   //===========================================================================================================
   public function edit_kendaraan($id_kendaraan,$nama_kendaraan,$merk,$jenis_kendaraan,$plat_nomor,$harga){
     $sql = "UPDATE data_kendaraan SET id_kendaraan='$id_kendaraan',nama_kendaraan='$nama_kendaraan',
@@ -100,14 +92,14 @@ class admin{
       ?>
       <script>
           alert("Data Berhasil Diubah");
-          location="dashboard_kendaraan.php";
+          location="index.php?page=kendaraan";
       </script>
       <?php
   }else{
       ?>
       <script>
           alert("Data gagal Diubah");
-          location="dashboard_kendaraan.php";
+          location="index.php?page=kendaraan";
       </script>
       <?php
     }
@@ -119,14 +111,14 @@ class admin{
       ?>
       <script>
           alert("Data Berhasil Diubah");
-          location="dashboard_kendaraan.php";
+          location="index.php?page=kendaraan";
       </script>
       <?php
   }else{
       ?>
       <script>
           alert("Data gagal Diubah");
-          location="dashboard_kendaraan.php";
+          location="index.php?page=kendaraan";
       </script>
       <?php
     }
@@ -135,15 +127,12 @@ class admin{
   public function konfirmasi($id_sewa){
     $sql=mysqli_query($this->conn, "SELECT * FROM vpeminjaman WHERE id_sewa = '$id_sewa'");
     $row = mysqli_fetch_assoc($sql);
-
     $tgl_kembali = date("Y-m-d");
     $tgl_deadline = $row['tgl_kembali'];
-
     $tgl_kembali_create = date_create($tgl_kembali);
     $tgl_deadline_create = date_create($tgl_deadline);
     $selisih = (int) date_diff($tgl_deadline_create, $tgl_kembali_create) -> format("%a");
     $denda = 10000;
-
     if ($tgl_kembali > $tgl_deadline) {
       $totalDenda = $denda * $selisih;
       $query = mysqli_query($this->conn, "UPDATE sewa_kendaraan SET tgl_dikembalikan = '$tgl_kembali', denda = '$totalDenda' WHERE id_sewa = '$id_sewa'");
@@ -151,12 +140,11 @@ class admin{
       $totalDenda = 0;
       $query = mysqli_query($this->conn, "UPDATE sewa_kendaraan SET tgl_dikembalikan = '$tgl_kembali', denda = '$totalDenda', lunas = 1 WHERE id_sewa = '$id_sewa'");
     }
-
     if ($query) {
       ?>
       <script>
           alert("Berhasil konfirmasi data..");
-          location="dashboard_kendaraan.php";
+          location="index.php";
       </script>
       <?php
     } else {
@@ -169,17 +157,21 @@ class admin{
         ?>
         <script>
             alert("Data berhasil di bayar..");
-            location="dashboard_kendaraan.php";
+            location="index.php";
         </script>
         <?php
       } else {
         ?>
         <script>
             alert("Data gagal di bayar..!");
-            location="dashboard_kendaraan.php";
+            location="index.php";
         </script>
         <?php
       }
+    }
+    public function list_user(){
+      $sql = mysqli_query($this->conn,"SELECT * FROM data_user");
+      return $sql;
     }
 }
 
